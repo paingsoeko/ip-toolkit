@@ -2,7 +2,11 @@
 
 A modern, feature-rich web application designed to provide detailed insights into your network connection. This tool fetches and displays your public IPv4/IPv6 addresses, local IP, geolocation data, ISP, hostname, and more in a clean, interactive, and responsive user interface.
 
-![IP & Network Toolkit Screenshot](https://raw.githubusercontent.com/user-attachments/assets/7b443c1e-c0c1-4b13-a447-0e2f5b5f8846)
+<img width="1396" height="1014" alt="image" src="https://github.com/user-attachments/assets/406c2c3c-e287-4622-8ac6-c85a582207f1" />
+
+<img width="1396" height="1014" alt="image" src="https://github.com/user-attachments/assets/932257ed-3fbb-4dbc-afbb-0d2f6b771105" />
+
+
 
 ## ✨ Features
 
