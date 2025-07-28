@@ -249,7 +249,7 @@ const App = () => {
       ]);
 
       const newIpv4 = ipv4Res.status === 'fulfilled' ? ipv4Res.value.ip : 'Not Detected';
-      const newIpv6 = ipv6Res.status === 'fulfilled' ? ipv6Res.value.ip : 'Not Detected';
+      const newIpv6 = 'Not Detected';
       
       setIpv4(newIpv4);
       setIpv6(newIpv6);
