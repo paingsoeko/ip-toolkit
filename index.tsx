@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -42,6 +41,30 @@ const RefreshIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
 );
 
+const SpeedometerIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19.34 14.66a10 10 0 1 1-14.68-9.32"/><path d="m13 13-6.5 6.5"/></svg>
+);
+
+const SignalIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a8 8 0 0 1 14 0"/><path d="M1.75 9.4a12 12 0 0 1 20.5 0"/><path d="M9 16.5a4 4 0 0 1 6 0"/></svg>
+);
+
+const BrowserIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M5 6h2"/><path d="M9 6h2"/></svg>
+);
+
+const DesktopIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+);
+
+const MaximizeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+);
+
+const CodeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+);
+
 
 // --- Data Types --- //
 interface IpInfo {
@@ -56,6 +79,14 @@ interface IpInfo {
   hostname: string;
 }
 
+interface SystemInfo {
+  browser: string;
+  os: string;
+  screenResolution: string;
+  devicePixelRatio: number;
+  userAgent: string;
+}
+
 // --- Component Prop Types --- //
 interface IpDisplayBoxProps {
     type: string;
@@ -65,7 +96,7 @@ interface IpDisplayBoxProps {
 interface InfoRowProps {
     icon: React.ReactNode;
     label: string;
-    value: string | undefined | null;
+    value: string | number | undefined | null;
     href?: string;
 }
 
@@ -73,6 +104,15 @@ interface MapDisplayProps {
     coords: [number, number] | null;
     city: string;
 }
+
+// --- Helper Functions --- //
+const getLatencyClass = (latency: number | null): string => {
+    if (latency === null) return 'failed';
+    if (latency < 100) return 'good';
+    if (latency < 250) return 'moderate';
+    return 'high';
+};
+
 
 // --- Placeholder Components --- //
 const IpDisplayBoxPlaceholder = ({ variant = 'primary' }: { variant?: 'primary' | 'secondary' }) => (
@@ -200,7 +240,16 @@ const App = () => {
   const [ipInfo, setIpInfo] = useState<IpInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'details'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'details' | 'tools' | 'system'>('overview');
+
+  // New states for Tools and System tabs
+  const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
+  const [downloadSpeed, setDownloadSpeed] = useState<number | null>(null);
+  const [isTestingSpeed, setIsTestingSpeed] = useState(false);
+  const [speedTestProgress, setSpeedTestProgress] = useState(0);
+  const [speedTestError, setSpeedTestError] = useState<string | null>(null);
+  const [pingResults, setPingResults] = useState<Record<string, number | null>>({});
+  const [isPinging, setIsPinging] = useState(false);
 
   const fetchLocalIp = useCallback(() => {
     try {
@@ -219,7 +268,6 @@ const App = () => {
               }
           }
       };
-      // Timeout to prevent hanging
       setTimeout(() => {
         if (!found) {
             setLocalIp('N/A');
@@ -241,42 +289,28 @@ const App = () => {
     setIpInfo(null);
     
     try {
-      // This is not awaited, it runs in parallel and sets its state when done.
       fetchLocalIp();
 
-      // Await the essential IP data.
       const [ipv4Res, ipv6Res] = await Promise.allSettled([
         fetch('https://api.ipify.org?format=json', { cache: 'no-store' }).then(res => res.json()),
         fetch('https://api64.ipify.org?format=json', { cache: 'no-store' }).then(res => res.json())
       ]);
 
       const newIpv4 = ipv4Res.status === 'fulfilled' ? ipv4Res.value.ip : 'Not Detected';
-      const newIpv6 = 'Not Detected';
+      const newIpv6 = ipv6Res.status === 'fulfilled' ? ipv6Res.value.ip : 'Not Detected';
       
-      // Show IPs as soon as they are fetched
       setIpv4(newIpv4);
       setIpv6(newIpv6);
 
       const geoLookupIp = newIpv4 !== 'N/A' && newIpv4 !== 'Not Detected' ? newIpv4 : (newIpv6 !== 'N/A' && newIpv6 !== 'Not Detected' ? newIpv6 : null);
 
       if (geoLookupIp) {
-        // Fetch optional geo data without awaiting it.
-        // This makes the UI update with IP info faster.
-        // Errors are caught and handled locally, preventing a global error state.
         fetch(`https://ipinfo.io/${geoLookupIp}/json`)
-          .then(response => {
-            if (response.ok) {
-              return response.json();
-            }
-            console.warn(`Failed to fetch geo information. Status: ${response.statusText}`);
-            return null; // Resolve with null on error to handle gracefully
-          })
-          .then((data: IpInfo | null) => {
-            setIpInfo(data);
-          })
+          .then(response => response.ok ? response.json() : null)
+          .then((data: IpInfo | null) => setIpInfo(data))
           .catch(err => {
             console.warn("Error processing geo information:", err);
-            setIpInfo(null); // Ensure state is null on any failure
+            setIpInfo(null);
           });
       } else {
         console.warn("Could not determine a public IP for geolocation.");
@@ -285,17 +319,123 @@ const App = () => {
       console.error("Failed to fetch primary IP data:", err);
       setError(err.message || 'An unexpected error occurred.');
     } finally {
-      // setLoading(false) is called after IPs are fetched, but before geo data might be ready.
-      // This makes the app feel faster.
       setLoading(false);
     }
   }, [fetchLocalIp]);
 
+  const getSystemInfo = () => {
+    const userAgent = navigator.userAgent;
+    const getOS = () => {
+        if (/windows/i.test(userAgent)) return 'Windows';
+        if (/macintosh|mac os x/i.test(userAgent)) return 'macOS';
+        if (/android/i.test(userAgent)) return 'Android';
+        if (/linux/i.test(userAgent)) return 'Linux';
+        if (/iphone|ipad|ipod/i.test(userAgent)) return 'iOS';
+        return 'Unknown';
+    };
+    const getBrowser = () => {
+        if (/(edg|edge|msie|trident)/i.test(userAgent)) return 'Microsoft Edge';
+        if (/firefox|fxios/i.test(userAgent)) return 'Firefox';
+        if (/opr|opera/i.test(userAgent)) return 'Opera';
+        if (/chrome|crios/i.test(userAgent)) return 'Google Chrome';
+        if (/safari/i.test(userAgent)) return 'Apple Safari';
+        return 'Unknown';
+    };
+
+    setSystemInfo({
+        userAgent: userAgent,
+        browser: getBrowser(),
+        os: getOS(),
+        screenResolution: `${window.screen.width} x ${window.screen.height}`,
+        devicePixelRatio: window.devicePixelRatio
+    });
+  };
+
+  const handleSpeedTest = async () => {
+    setIsTestingSpeed(true);
+    setDownloadSpeed(null);
+    setSpeedTestProgress(0);
+    setSpeedTestError(null);
+
+    const testFileSize = 10 * 1024 * 1024; // 10MB
+    const testFileUrl = 'https://speed.cloudflare.com/__down';
+    const startTime = Date.now();
+
+    try {
+      const response = await fetch(`${testFileUrl}?bytes=${testFileSize}&t=${new Date().getTime()}`);
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.statusText}`);
+      }
+      if (!response.body) {
+        throw new Error("ReadableStream not supported by browser.");
+      }
+      
+      const reader = response.body.getReader();
+      let receivedLength = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        receivedLength += value.length;
+        setSpeedTestProgress((receivedLength / testFileSize) * 100);
+      }
+      
+      const endTime = Date.now();
+      const durationInSeconds = (endTime - startTime) / 1000;
+      if (durationInSeconds < 0.5) { // If test is too fast, result might be inaccurate.
+          throw new Error("Connection too fast for accurate measurement with this file size.");
+      }
+      const bitsLoaded = receivedLength * 8;
+      const speedMbps = (bitsLoaded / durationInSeconds) / 1000000;
+      
+      setDownloadSpeed(speedMbps);
+
+    } catch (error: any) {
+      console.error("Speed test failed:", error);
+      setSpeedTestError(error.message || "The test failed. Please try again.");
+      setDownloadSpeed(null);
+    } finally {
+      setIsTestingSpeed(false);
+    }
+  };
+
+  const handlePingTest = async () => {
+    setIsPinging(true);
+    setPingResults({});
+    // Use endpoints known to support cross-origin requests for latency testing.
+    const targets = {
+      'Google': 'https://www.google.com/generate_204',
+      'Cloudflare': 'https://speed.cloudflare.com/cdn-cgi/trace',
+      'GitHub': 'https://api.github.com',
+    };
+
+    for (const [name, url] of Object.entries(targets)) {
+      try {
+        const startTime = Date.now();
+        // Using 'no-cors' is more reliable for latency tests as it avoids CORS policy errors.
+        // We don't need to read the response, just time the round trip.
+        await fetch(`${url}?t=${new Date().getTime()}`, { cache: 'no-store', mode: 'no-cors' });
+        const latency = Date.now() - startTime;
+        setPingResults(prev => ({...prev, [name]: latency}));
+      } catch (e) {
+        console.error(`Ping failed for ${name}:`, e);
+        setPingResults(prev => ({...prev, [name]: null}));
+      }
+    }
+    setIsPinging(false);
+  };
+
   useEffect(() => {
     fetchIpData();
+    getSystemInfo();
   }, [fetchIpData]);
   
   const showGeoPlaceholders = !ipInfo && (!!ipv4 || !!ipv6) && (ipv4 !== 'Not Detected' || ipv6 !== 'Not Detected');
+  
+  const speedTestGaugeProgress = isTestingSpeed ? speedTestProgress : (downloadSpeed !== null ? 100 : 0);
+  const gaugeCircumference = 2 * Math.PI * 44; // r = 44
 
   return (
     <div className="container">
@@ -322,6 +462,8 @@ const App = () => {
             <nav className="tab-nav">
               <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Overview</button>
               <button className={`tab-btn ${activeTab === 'details' ? 'active' : ''}`} onClick={() => setActiveTab('details')}>Details</button>
+              <button className={`tab-btn ${activeTab === 'tools' ? 'active' : ''}`} onClick={() => setActiveTab('tools')}>Tools</button>
+              <button className={`tab-btn ${activeTab === 'system' ? 'active' : ''}`} onClick={() => setActiveTab('system')}>System</button>
             </nav>
             <div className="tab-content">
               <div className={`tab-pane ${activeTab === 'overview' ? 'active' : ''}`}>
@@ -415,6 +557,88 @@ const App = () => {
                   </div>
                 )}
               </div>
+               <div className={`tab-pane ${activeTab === 'tools' ? 'active' : ''}`}>
+                    <div className="tools-grid">
+                        <div className="tool-card">
+                            <div className="tool-header">
+                                <SpeedometerIcon />
+                                <h3>Download Speed</h3>
+                            </div>
+                            <p className="tool-subtitle">Measure your connection's download bandwidth.</p>
+                            <div className="gauge-display">
+                                <div className="gauge-container">
+                                    <svg className="gauge" viewBox="0 0 100 100">
+                                        <circle className="gauge-bg" cx="50" cy="50" r="44"></circle>
+                                        <circle 
+                                            className="gauge-fg" 
+                                            cx="50" cy="50" r="44"
+                                            strokeDasharray={gaugeCircumference}
+                                            strokeDashoffset={gaugeCircumference * (1 - speedTestGaugeProgress / 100)}
+                                        ></circle>
+                                    </svg>
+                                    <div className="gauge-text">
+                                        {isTestingSpeed ? (
+                                            <div className="speed-value loading-dots"><span>.</span><span>.</span><span>.</span></div>
+                                        ) : downloadSpeed !== null ? (
+                                            <div className="speed-value">{downloadSpeed.toFixed(2)}</div>
+                                        ) : (
+                                            <div className="speed-value">--</div>
+                                        )}
+                                        <div className="speed-unit">Mbps</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {speedTestError && !isTestingSpeed && (
+                                <div className="tool-error">{speedTestError}</div>
+                            )}
+                            <button className="tool-btn" onClick={handleSpeedTest} disabled={isTestingSpeed}>
+                                {isTestingSpeed ? 'Testing...' : 'Start Test'}
+                            </button>
+                        </div>
+                        <div className="tool-card">
+                            <div className="tool-header">
+                                <SignalIcon />
+                                <h3>Network Latency</h3>
+                            </div>
+                             <p className="tool-subtitle">Test response time to major services.</p>
+                            <div className="ping-results">
+                                {Object.entries({ 'Google': 0, 'Cloudflare': 0, 'GitHub': 0 }).map(([name]) => (
+                                    <div className="ping-row" key={name}>
+                                        <div className="ping-target">
+                                            <span className={`ping-status-dot ${isPinging || !pingResults.hasOwnProperty(name) ? 'pending' : getLatencyClass(pingResults[name])}`}></span>
+                                            {name}
+                                        </div>
+                                        {isPinging && !pingResults.hasOwnProperty(name) ? (
+                                            <span className="ping-value loading-dots"><span>.</span><span>.</span><span>.</span></span>
+                                        ) : pingResults.hasOwnProperty(name) ? (
+                                            pingResults[name] === null ? <span className="ping-value error">Failed</span> : <span className="ping-value">{pingResults[name]} ms</span>
+                                        ) : (
+                                            <span className="ping-value">-- ms</span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <button className="tool-btn" onClick={handlePingTest} disabled={isPinging}>
+                                {isPinging ? 'Pinging...' : 'Run Ping Test'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div className={`tab-pane ${activeTab === 'system' ? 'active' : ''}`}>
+                   {systemInfo ? (
+                        <div className="info-grid">
+                            <InfoRow icon={<BrowserIcon />} label="Browser" value={systemInfo.browser} />
+                            <InfoRow icon={<DesktopIcon />} label="Operating System" value={systemInfo.os} />
+                            <InfoRow icon={<MaximizeIcon />} label="Screen Resolution" value={systemInfo.screenResolution} />
+                            <InfoRow icon={<CodeIcon />} label="Device Pixel Ratio" value={systemInfo.devicePixelRatio} />
+                            <InfoRow icon={<ServerIcon />} label="User Agent" value={systemInfo.userAgent} />
+                        </div>
+                   ) : (
+                        <div className="info-grid">
+                            {[...Array(5)].map((_, i) => <InfoRowPlaceholder key={i} />)}
+                        </div>
+                   )}
+                </div>
             </div>
           </>
         )}
