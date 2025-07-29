@@ -468,6 +468,15 @@ p {
   border-radius: 12px;
   border: 1px solid var(--border-color);
   background-color: var(--placeholder-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-placeholder-message {
+    color: var(--secondary-text-color);
+    text-align: center;
+    padding: 1rem;
 }
 
 .info-row.placeholder-shimmer {

@@ -241,8 +241,10 @@ const App = () => {
     setIpInfo(null);
     
     try {
+      // This is not awaited, it runs in parallel and sets its state when done.
       fetchLocalIp();
 
+      // Await the essential IP data.
       const [ipv4Res, ipv6Res] = await Promise.allSettled([
         fetch('https://api.ipify.org?format=json', { cache: 'no-store' }).then(res => res.json()),
         fetch('https://api64.ipify.org?format=json', { cache: 'no-store' }).then(res => res.json())
@@ -251,25 +253,40 @@ const App = () => {
       const newIpv4 = ipv4Res.status === 'fulfilled' ? ipv4Res.value.ip : 'Not Detected';
       const newIpv6 = 'Not Detected';
       
+      // Show IPs as soon as they are fetched
       setIpv4(newIpv4);
       setIpv6(newIpv6);
 
       const geoLookupIp = newIpv4 !== 'N/A' && newIpv4 !== 'Not Detected' ? newIpv4 : (newIpv6 !== 'N/A' && newIpv6 !== 'Not Detected' ? newIpv6 : null);
 
       if (geoLookupIp) {
-        const response = await fetch(`https://ipinfo.io/${geoLookupIp}/json`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch geo information.`);
-        }
-        const data: IpInfo = await response.json();
-        setIpInfo(data);
+        // Fetch optional geo data without awaiting it.
+        // This makes the UI update with IP info faster.
+        // Errors are caught and handled locally, preventing a global error state.
+        fetch(`https://ipinfo.io/${geoLookupIp}/json`)
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            }
+            console.warn(`Failed to fetch geo information. Status: ${response.statusText}`);
+            return null; // Resolve with null on error to handle gracefully
+          })
+          .then((data: IpInfo | null) => {
+            setIpInfo(data);
+          })
+          .catch(err => {
+            console.warn("Error processing geo information:", err);
+            setIpInfo(null); // Ensure state is null on any failure
+          });
       } else {
-          throw new Error("Could not determine a public IP for geolocation.");
+        console.warn("Could not determine a public IP for geolocation.");
       }
     } catch (err: any) {
-      console.error("Failed to fetch IP data:", err);
+      console.error("Failed to fetch primary IP data:", err);
       setError(err.message || 'An unexpected error occurred.');
     } finally {
+      // setLoading(false) is called after IPs are fetched, but before geo data might be ready.
+      // This makes the app feel faster.
       setLoading(false);
     }
   }, [fetchLocalIp]);
@@ -278,6 +295,8 @@ const App = () => {
     fetchIpData();
   }, [fetchIpData]);
   
+  const showGeoPlaceholders = !ipInfo && (!!ipv4 || !!ipv6) && (ipv4 !== 'Not Detected' || ipv6 !== 'Not Detected');
+
   return (
     <div className="container">
       <main className="ip-info-card">
@@ -328,10 +347,20 @@ const App = () => {
                         <IpDisplayBox type="IPv6 Address" ip={ipv6} />
                       </div>
                     </div>
-                    <MapDisplay 
-                      coords={ipInfo?.loc ? ipInfo.loc.split(',').map(Number) as [number, number] : null} 
-                      city={ipInfo?.city || 'Unknown'} 
-                    />
+                    {ipInfo && ipInfo.loc ? (
+                      <MapDisplay 
+                        coords={ipInfo.loc.split(',').map(Number) as [number, number]} 
+                        city={ipInfo.city || 'Unknown'} 
+                      />
+                    ) : (
+                      <div id="map" className={`map-placeholder ${showGeoPlaceholders ? 'placeholder-shimmer' : ''}`}>
+                        {!showGeoPlaceholders && (
+                          <div className="map-placeholder-message">
+                            Geolocation data not available
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -342,27 +371,47 @@ const App = () => {
                   </div>
                 ) : (
                   <div className="info-grid">
-                    <InfoRow 
-                      icon={<BuildingIcon/>} 
-                      label="Service Provider (ISP)" 
-                      value={ipInfo?.org} 
-                      href={ipInfo?.org ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.org)}` : undefined} 
-                    />
-                    <InfoRow 
-                      icon={<LocationIcon />} 
-                      label="Location" 
-                      value={ipInfo ? `${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country}` : 'N/A'} 
-                      href={ipInfo?.loc ? `https://www.google.com/maps/search/?api=1&query=${ipInfo.loc}`: undefined} 
-                    />
-                    <InfoRow 
-                      icon={<ServerIcon />} 
-                      label="Hostname" 
-                      value={ipInfo?.hostname} 
-                      href={ipInfo?.hostname ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.hostname)}` : undefined} 
-                    />
                     <InfoRow icon={<RouterIcon />} label="Local IP Address" value={localIp} />
-                    <InfoRow icon={<ClockIcon />} label="Timezone" value={ipInfo?.timezone} />
-                    <InfoRow icon={<LocationIcon />} label="Postal Code" value={ipInfo?.postal} />
+                    {ipInfo ? (
+                      <>
+                        <InfoRow 
+                          icon={<BuildingIcon/>} 
+                          label="Service Provider (ISP)" 
+                          value={ipInfo?.org} 
+                          href={ipInfo?.org ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.org)}` : undefined} 
+                        />
+                        <InfoRow 
+                          icon={<LocationIcon />} 
+                          label="Location" 
+                          value={ipInfo ? `${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country}` : 'N/A'} 
+                          href={ipInfo?.loc ? `https://www.google.com/maps/search/?api=1&query=${ipInfo.loc}`: undefined} 
+                        />
+                        <InfoRow 
+                          icon={<ServerIcon />} 
+                          label="Hostname" 
+                          value={ipInfo?.hostname} 
+                          href={ipInfo?.hostname ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.hostname)}` : undefined} 
+                        />
+                        <InfoRow icon={<ClockIcon />} label="Timezone" value={ipInfo?.timezone} />
+                        <InfoRow icon={<LocationIcon />} label="Postal Code" value={ipInfo?.postal} />
+                      </>
+                    ) : showGeoPlaceholders ? (
+                       <>
+                         <InfoRowPlaceholder />
+                         <InfoRowPlaceholder />
+                         <InfoRowPlaceholder />
+                         <InfoRowPlaceholder />
+                         <InfoRowPlaceholder />
+                       </>
+                    ) : (
+                        <>
+                           <InfoRow icon={<BuildingIcon/>} label="Service Provider (ISP)" value={'N/A'} />
+                           <InfoRow icon={<LocationIcon />} label="Location" value={'N/A'} />
+                           <InfoRow icon={<ServerIcon />} label="Hostname" value={'N/A'} />
+                           <InfoRow icon={<ClockIcon />} label="Timezone" value={'N/A'} />
+                           <InfoRow icon={<LocationIcon />} label="Postal Code" value={'N/A'} />
+                        </>
+                    )}
                   </div>
                 )}
               </div>
