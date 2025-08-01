@@ -42,8 +42,9 @@ const RefreshIcon = () => (
 );
 
 const SpeedometerIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19.34 14.66a10 10 0 1 1-14.68-9.32"/><path d="m13 13-6.5 6.5"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3.3 3.3 3.4 3.4c4.1 4.1 4.1 10.8 0 14.9-4.1 4.1-10.8 4.1-14.9 0-4.1-4.1-4.1-10.8 0-14.9C-4.1-1.1-1.1-4.1 3.3 3.3z"/><path d="M12 12 7.1 7.1"/></svg>
 );
+
 
 const SignalIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a8 8 0 0 1 14 0"/><path d="M1.75 9.4a12 12 0 0 1 20.5 0"/><path d="M9 16.5a4 4 0 0 1 6 0"/></svg>
@@ -57,16 +58,26 @@ const DesktopIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
 );
 
-const MaximizeIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+const HomeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
 );
 
 const CodeIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
 );
 
+const DnsIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.2 7.2a4 4 0 0 1 0 5.6l-2.8 2.8a4 4 0 0 1-5.6 0 4 4 0 0 1 0-5.6l2.8-2.8a4 4 0 0 1 5.6 0z"/><path d="M6.8 16.8a4 4 0 0 1 0-5.6l2.8-2.8a4 4 0 0 1 5.6 0"/></svg>
+);
+
+const WhoisIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+);
+
 
 // --- Data Types --- //
+type SectionId = 'overview' | 'details' | 'tools' | 'system';
+
 interface IpInfo {
   ip: string;
   city: string;
@@ -85,6 +96,14 @@ interface SystemInfo {
   screenResolution: string;
   devicePixelRatio: number;
   userAgent: string;
+}
+
+interface DnsRecord {
+    name: string;
+    type: number;
+    TTL: number;
+    data: string;
+    typeName: string;
 }
 
 // --- Component Prop Types --- //
@@ -115,13 +134,12 @@ const getLatencyClass = (latency: number | null): string => {
 
 
 // --- Placeholder Components --- //
-const IpDisplayBoxPlaceholder = ({ variant = 'primary' }: { variant?: 'primary' | 'secondary' }) => (
-    <div className={`ip-display-box placeholder-shimmer ${variant === 'primary' ? 'ip-primary-placeholder' : 'ip-secondary'}`}>
-        <div className="ip-details">
-            <div className="placeholder-line" style={{ width: '80px', height: '12px', marginBottom: '8px' }}></div>
-            <div className="placeholder-line" style={{ width: '150px', height: variant === 'primary' ? '28px' : '20px' }}></div>
-        </div>
-    </div>
+const HeroPlaceholder = () => (
+    <header className="hero-header placeholder-shimmer">
+        <div className="placeholder-line" style={{ width: '200px', height: '20px', marginBottom: '1rem' }}></div>
+        <div className="placeholder-line" style={{ width: '350px', height: '48px', marginBottom: '1.5rem' }}></div>
+        <div className="placeholder-line" style={{ width: '120px', height: '48px', borderRadius: '8px' }}></div>
+    </header>
 );
 
 const MapPlaceholder = () => (
@@ -130,9 +148,7 @@ const MapPlaceholder = () => (
 
 const InfoRowPlaceholder = () => (
     <div className="info-row placeholder-shimmer">
-        <div className="info-icon">
-            <div className="placeholder-circle"></div>
-        </div>
+        <div className="info-icon placeholder-circle"></div>
         <div className="info-text">
             <div className="placeholder-line" style={{ width: '100px', height: '12px', marginBottom: '8px' }}></div>
             <div className="placeholder-line" style={{ width: '150px', height: '16px' }}></div>
@@ -187,7 +203,7 @@ const InfoRow = React.memo(({ icon, label, value, href }: InfoRowProps) => {
     );
 
     if (href && value && value !== 'N/A') {
-        return <a href={href} target="_blank" rel="noopener noreferrer">{content}</a>;
+        return <a href={href} target="_blank" rel="noopener noreferrer" className="info-row-link">{content}</a>;
     }
 
     return content;
@@ -221,17 +237,45 @@ const MapDisplay = React.memo(({ coords, city }: MapDisplayProps) => {
     return <div id="map" ref={mapRef}></div>;
 });
 
-const Footer = () => (
-    <footer className="card-footer">
-        <p>
-            Our IP lookup tool provides real-time data about your public and local network connection,
-            including ISP, hostname, and an interactive map of your approximate location.
-        </p>
-        <p className="copyright">
-            &copy; {new Date().getFullYear()} IP & Network Toolkit. All Rights Reserved.
-        </p>
-    </footer>
+const Section = ({ id, title, children, refProp }) => (
+    <section id={id} className="content-section" ref={refProp}>
+        <h2 className="section-title">{title}</h2>
+        {children}
+    </section>
 );
+
+const NAV_ITEMS = [
+    { id: 'overview', label: 'Overview', icon: <HomeIcon/> },
+    { id: 'details', label: 'Details', icon: <ServerIcon/> },
+    { id: 'tools', label: 'Tools', icon: <SpeedometerIcon/> },
+    { id: 'system', label: 'System', icon: <DesktopIcon/> },
+];
+
+const TopNav = ({ activeSection }) => {
+    const handleNavClick = (sectionId: SectionId) => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    return (
+        <nav className="top-nav">
+            <div className="nav-container">
+                <span className="nav-logo">IP & Network Toolkit</span>
+                <div className="nav-links">
+                    {NAV_ITEMS.map(({ id, label }) => (
+                        <button 
+                            key={id} 
+                            onClick={() => handleNavClick(id as SectionId)}
+                            className={activeSection === id ? 'active' : ''}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </nav>
+    );
+};
+
 
 const App = () => {
   const [ipv4, setIpv4] = useState<string | null>(null);
@@ -240,9 +284,16 @@ const App = () => {
   const [ipInfo, setIpInfo] = useState<IpInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'details' | 'tools' | 'system'>('overview');
+  const [activeSection, setActiveSection] = useState<SectionId>('overview');
+  const [heroCopied, setHeroCopied] = useState(false);
+  
+  const sectionRefs = {
+      overview: useRef<HTMLElement>(null),
+      details: useRef<HTMLElement>(null),
+      tools: useRef<HTMLElement>(null),
+      system: useRef<HTMLElement>(null),
+  };
 
-  // New states for Tools and System tabs
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
   const [downloadSpeed, setDownloadSpeed] = useState<number | null>(null);
   const [isTestingSpeed, setIsTestingSpeed] = useState(false);
@@ -250,6 +301,15 @@ const App = () => {
   const [speedTestError, setSpeedTestError] = useState<string | null>(null);
   const [pingResults, setPingResults] = useState<Record<string, number | null>>({});
   const [isPinging, setIsPinging] = useState(false);
+  const [dnsQuery, setDnsQuery] = useState<string>('google.com');
+  const [dnsResults, setDnsResults] = useState<DnsRecord[] | null>(null);
+  const [isDnsLoading, setIsDnsLoading] = useState<boolean>(false);
+  const [dnsError, setDnsError] = useState<string | null>(null);
+  const [whoisQuery, setWhoisQuery] = useState<string>('google.com');
+  const [whoisResults, setWhoisResults] = useState<string | null>(null);
+  const [isWhoisLoading, setIsWhoisLoading] = useState<boolean>(false);
+  const [whoisError, setWhoisError] = useState<string | null>(null);
+
 
   const fetchLocalIp = useCallback(() => {
     try {
@@ -384,8 +444,8 @@ const App = () => {
       
       const endTime = Date.now();
       const durationInSeconds = (endTime - startTime) / 1000;
-      if (durationInSeconds < 0.5) { // If test is too fast, result might be inaccurate.
-          throw new Error("Connection too fast for accurate measurement with this file size.");
+      if (durationInSeconds < 0.5) { 
+          throw new Error("Connection too fast for accurate measurement.");
       }
       const bitsLoaded = receivedLength * 8;
       const speedMbps = (bitsLoaded / durationInSeconds) / 1000000;
@@ -404,7 +464,6 @@ const App = () => {
   const handlePingTest = async () => {
     setIsPinging(true);
     setPingResults({});
-    // Use endpoints known to support cross-origin requests for latency testing.
     const targets = {
       'Google': 'https://www.google.com/generate_204',
       'Cloudflare': 'https://speed.cloudflare.com/cdn-cgi/trace',
@@ -414,8 +473,6 @@ const App = () => {
     for (const [name, url] of Object.entries(targets)) {
       try {
         const startTime = Date.now();
-        // Using 'no-cors' is more reliable for latency tests as it avoids CORS policy errors.
-        // We don't need to read the response, just time the round trip.
         await fetch(`${url}?t=${new Date().getTime()}`, { cache: 'no-store', mode: 'no-cors' });
         const latency = Date.now() - startTime;
         setPingResults(prev => ({...prev, [name]: latency}));
@@ -427,224 +484,286 @@ const App = () => {
     setIsPinging(false);
   };
 
+  const handleDnsLookup = async () => {
+      if (!dnsQuery) return;
+      setIsDnsLoading(true);
+      setDnsResults(null);
+      setDnsError(null);
+      try {
+          const recordTypes = ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME'];
+          const requests = recordTypes.map(type =>
+              fetch(`https://dns.google/resolve?name=${encodeURIComponent(dnsQuery)}&type=${type}`).then(res => res.json())
+          );
+
+          const responses = await Promise.all(requests);
+          const typeNameMap = { 1: 'A', 28: 'AAAA', 15: 'MX', 16: 'TXT', 2: 'NS', 5: 'CNAME' };
+          
+          const finalResults = responses.flatMap(res => 
+              res.Answer ? res.Answer.map(ans => ({...ans, typeName: typeNameMap[ans.type] || `Type ${ans.type}`})) : []
+          ).sort((a, b) => a.type - b.type);
+
+          if (finalResults.length === 0) {
+              setDnsError(`No common DNS records found for "${dnsQuery}".`);
+          } else {
+              setDnsResults(finalResults);
+          }
+      } catch (err) {
+          setDnsError("Failed to fetch DNS records. Please check the domain and your connection.");
+      } finally {
+          setIsDnsLoading(false);
+      }
+  };
+
+  const handleWhoisLookup = async () => {
+      if (!whoisQuery) return;
+      setIsWhoisLoading(true);
+      setWhoisResults(null);
+      setWhoisError(null);
+      try {
+          const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(whoisQuery) || whoisQuery.includes(':');
+          const url = `https://rdap.org/${isIp ? 'ip' : 'domain'}/${encodeURIComponent(whoisQuery)}`;
+          
+          const response = await fetch(url);
+          if (!response.ok) {
+              const errorData = await response.json().catch(() => null);
+              throw new Error(errorData?.description || `Could not find info for "${whoisQuery}". Status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          setWhoisResults(JSON.stringify(data, null, 2));
+      } catch (err: any) {
+          setWhoisError(err.message || "WHOIS lookup failed.");
+      } finally {
+          setIsWhoisLoading(false);
+      }
+  };
+
+  const handleHeroCopy = () => {
+    if (ipv4 && ipv4 !== 'Not Detected' && navigator.clipboard) {
+        navigator.clipboard.writeText(ipv4).then(() => {
+            setHeroCopied(true);
+            setTimeout(() => setHeroCopied(false), 2000);
+        }).catch(err => {
+            console.error('Failed to copy IP:', err);
+        });
+    }
+  };
+
   useEffect(() => {
     fetchIpData();
     getSystemInfo();
   }, [fetchIpData]);
   
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setActiveSection(entry.target.id as SectionId);
+                }
+            });
+        },
+        { rootMargin: '-30% 0px -70% 0px', threshold: 0 }
+    );
+
+    Object.values(sectionRefs).forEach(ref => {
+        if (ref.current) observer.observe(ref.current);
+    });
+
+    return () => {
+        Object.values(sectionRefs).forEach(ref => {
+            if (ref.current) observer.unobserve(ref.current);
+        });
+    };
+  }, [sectionRefs]);
+
+
   const showGeoPlaceholders = !ipInfo && (!!ipv4 || !!ipv6) && (ipv4 !== 'Not Detected' || ipv6 !== 'Not Detected');
-  
   const speedTestGaugeProgress = isTestingSpeed ? speedTestProgress : (downloadSpeed !== null ? 100 : 0);
-  const gaugeCircumference = 2 * Math.PI * 44; // r = 44
+  const gaugeCircumference = 2 * Math.PI * 44;
+  
+  if (error) {
+      return <div className="error-fullpage">{error}</div>
+  }
 
   return (
-    <div className="container">
-      <main className="ip-info-card">
-        <header className="card-header">
-          <div className="title-wrapper">
-            <h1>IP & Network Toolkit</h1>
-            <p>Your complete network diagnostic tool.</p>
-          </div>
-          <button 
-            className={`refresh-btn ${loading ? 'loading' : ''}`} 
-            onClick={fetchIpData} 
-            disabled={loading}
-            aria-label="Refresh IP Information"
-          >
-            <RefreshIcon />
-          </button>
-        </header>
-
-        {error ? (
-          <div className="error">{error}</div>
+    <>
+      <TopNav activeSection={activeSection} />
+      <main className="main-container">
+        {loading ? (
+          <HeroPlaceholder />
         ) : (
-          <>
-            <nav className="tab-nav">
-              <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Overview</button>
-              <button className={`tab-btn ${activeTab === 'details' ? 'active' : ''}`} onClick={() => setActiveTab('details')}>Details</button>
-              <button className={`tab-btn ${activeTab === 'tools' ? 'active' : ''}`} onClick={() => setActiveTab('tools')}>Tools</button>
-              <button className={`tab-btn ${activeTab === 'system' ? 'active' : ''}`} onClick={() => setActiveTab('system')}>System</button>
-            </nav>
-            <div className="tab-content">
-              <div className={`tab-pane ${activeTab === 'overview' ? 'active' : ''}`}>
-                {loading ? (
-                  <>
-                    <div className="ip-layout">
-                      <div className="ip-primary">
-                        <IpDisplayBoxPlaceholder variant="primary" />
-                      </div>
-                      <div className="ip-secondary">
-                        <IpDisplayBoxPlaceholder variant="secondary" />
-                      </div>
-                    </div>
-                    <MapPlaceholder />
-                  </>
-                ) : (
-                  <>
-                    <div className="ip-layout">
-                      <div className="ip-primary">
-                        <IpDisplayBox type="IPv4 Address" ip={ipv4} />
-                      </div>
-                      <div className="ip-secondary">
-                        <IpDisplayBox type="IPv6 Address" ip={ipv6} />
-                      </div>
-                    </div>
-                    {ipInfo && ipInfo.loc ? (
-                      <MapDisplay 
-                        coords={ipInfo.loc.split(',').map(Number) as [number, number]} 
-                        city={ipInfo.city || 'Unknown'} 
-                      />
-                    ) : (
-                      <div id="map" className={`map-placeholder ${showGeoPlaceholders ? 'placeholder-shimmer' : ''}`}>
-                        {!showGeoPlaceholders && (
-                          <div className="map-placeholder-message">
-                            Geolocation data not available
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-              <div className={`tab-pane ${activeTab === 'details' ? 'active' : ''}`}>
-                {loading ? (
-                  <div className="info-grid">
-                    {[...Array(6)].map((_, i) => <InfoRowPlaceholder key={i} />)}
-                  </div>
-                ) : (
-                  <div className="info-grid">
-                    <InfoRow icon={<RouterIcon />} label="Local IP Address" value={localIp} />
-                    {ipInfo ? (
-                      <>
-                        <InfoRow 
-                          icon={<BuildingIcon/>} 
-                          label="Service Provider (ISP)" 
-                          value={ipInfo?.org} 
-                          href={ipInfo?.org ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.org)}` : undefined} 
-                        />
-                        <InfoRow 
-                          icon={<LocationIcon />} 
-                          label="Location" 
-                          value={ipInfo ? `${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country}` : 'N/A'} 
-                          href={ipInfo?.loc ? `https://www.google.com/maps/search/?api=1&query=${ipInfo.loc}`: undefined} 
-                        />
-                        <InfoRow 
-                          icon={<ServerIcon />} 
-                          label="Hostname" 
-                          value={ipInfo?.hostname} 
-                          href={ipInfo?.hostname ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.hostname)}` : undefined} 
-                        />
-                        <InfoRow icon={<ClockIcon />} label="Timezone" value={ipInfo?.timezone} />
-                        <InfoRow icon={<LocationIcon />} label="Postal Code" value={ipInfo?.postal} />
-                      </>
-                    ) : showGeoPlaceholders ? (
-                       <>
-                         <InfoRowPlaceholder />
-                         <InfoRowPlaceholder />
-                         <InfoRowPlaceholder />
-                         <InfoRowPlaceholder />
-                         <InfoRowPlaceholder />
-                       </>
-                    ) : (
-                        <>
-                           <InfoRow icon={<BuildingIcon/>} label="Service Provider (ISP)" value={'N/A'} />
-                           <InfoRow icon={<LocationIcon />} label="Location" value={'N/A'} />
-                           <InfoRow icon={<ServerIcon />} label="Hostname" value={'N/A'} />
-                           <InfoRow icon={<ClockIcon />} label="Timezone" value={'N/A'} />
-                           <InfoRow icon={<LocationIcon />} label="Postal Code" value={'N/A'} />
-                        </>
-                    )}
-                  </div>
-                )}
-              </div>
-               <div className={`tab-pane ${activeTab === 'tools' ? 'active' : ''}`}>
-                    <div className="tools-grid">
-                        <div className="tool-card">
-                            <div className="tool-header">
-                                <SpeedometerIcon />
-                                <h3>Download Speed</h3>
-                            </div>
-                            <p className="tool-subtitle">Measure your connection's download bandwidth.</p>
-                            <div className="gauge-display">
-                                <div className="gauge-container">
-                                    <svg className="gauge" viewBox="0 0 100 100">
-                                        <circle className="gauge-bg" cx="50" cy="50" r="44"></circle>
-                                        <circle 
-                                            className="gauge-fg" 
-                                            cx="50" cy="50" r="44"
-                                            strokeDasharray={gaugeCircumference}
-                                            strokeDashoffset={gaugeCircumference * (1 - speedTestGaugeProgress / 100)}
-                                        ></circle>
-                                    </svg>
-                                    <div className="gauge-text">
-                                        {isTestingSpeed ? (
-                                            <div className="speed-value loading-dots"><span>.</span><span>.</span><span>.</span></div>
-                                        ) : downloadSpeed !== null ? (
-                                            <div className="speed-value">{downloadSpeed.toFixed(2)}</div>
-                                        ) : (
-                                            <div className="speed-value">--</div>
-                                        )}
-                                        <div className="speed-unit">Mbps</div>
-                                    </div>
-                                </div>
-                            </div>
-                            {speedTestError && !isTestingSpeed && (
-                                <div className="tool-error">{speedTestError}</div>
-                            )}
-                            <button className="tool-btn" onClick={handleSpeedTest} disabled={isTestingSpeed}>
-                                {isTestingSpeed ? 'Testing...' : 'Start Test'}
-                            </button>
-                        </div>
-                        <div className="tool-card">
-                            <div className="tool-header">
-                                <SignalIcon />
-                                <h3>Network Latency</h3>
-                            </div>
-                             <p className="tool-subtitle">Test response time to major services.</p>
-                            <div className="ping-results">
-                                {Object.entries({ 'Google': 0, 'Cloudflare': 0, 'GitHub': 0 }).map(([name]) => (
-                                    <div className="ping-row" key={name}>
-                                        <div className="ping-target">
-                                            <span className={`ping-status-dot ${isPinging || !pingResults.hasOwnProperty(name) ? 'pending' : getLatencyClass(pingResults[name])}`}></span>
-                                            {name}
-                                        </div>
-                                        {isPinging && !pingResults.hasOwnProperty(name) ? (
-                                            <span className="ping-value loading-dots"><span>.</span><span>.</span><span>.</span></span>
-                                        ) : pingResults.hasOwnProperty(name) ? (
-                                            pingResults[name] === null ? <span className="ping-value error">Failed</span> : <span className="ping-value">{pingResults[name]} ms</span>
-                                        ) : (
-                                            <span className="ping-value">-- ms</span>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                            <button className="tool-btn" onClick={handlePingTest} disabled={isPinging}>
-                                {isPinging ? 'Pinging...' : 'Run Ping Test'}
-                            </button>
-                        </div>
-                    </div>
+          <header className="hero-header">
+              <h1>Your Public IP Address</h1>
+              <p 
+                className={`hero-ip ${ipv4 && ipv4 !== 'Not Detected' ? 'hero-ip-clickable' : ''}`}
+                onClick={handleHeroCopy}
+                title={ipv4 && ipv4 !== 'Not Detected' ? 'Click to copy' : ''}
+              >
+                  {heroCopied ? 'Copied!' : (ipv4 || 'Detecting...')}
+              </p>
+              <button
+                  className={`refresh-btn ${loading ? 'loading' : ''}`}
+                  onClick={fetchIpData}
+                  disabled={loading}
+                  aria-label="Refresh IP Information"
+              >
+                  <RefreshIcon />
+                  <span>Refresh</span>
+              </button>
+          </header>
+        )}
+        
+        <Section id="overview" title="IP Overview" refProp={sectionRefs.overview}>
+          {loading ? (
+            <div className="overview-grid">
+                <div className="ip-layout">
+                  <div className="ip-display-box placeholder-shimmer ip-primary"><div className="placeholder-line" style={{ width: '150px', height: '28px' }}></div></div>
+                  <div className="ip-display-box placeholder-shimmer"><div className="placeholder-line" style={{ width: '150px', height: '20px' }}></div></div>
                 </div>
-                <div className={`tab-pane ${activeTab === 'system' ? 'active' : ''}`}>
-                   {systemInfo ? (
-                        <div className="info-grid">
-                            <InfoRow icon={<BrowserIcon />} label="Browser" value={systemInfo.browser} />
-                            <InfoRow icon={<DesktopIcon />} label="Operating System" value={systemInfo.os} />
-                            <InfoRow icon={<MaximizeIcon />} label="Screen Resolution" value={systemInfo.screenResolution} />
-                            <InfoRow icon={<CodeIcon />} label="Device Pixel Ratio" value={systemInfo.devicePixelRatio} />
-                            <InfoRow icon={<ServerIcon />} label="User Agent" value={systemInfo.userAgent} />
+                <MapPlaceholder />
+            </div>
+           ) : (
+            <div className="overview-grid">
+              <div className="ip-layout">
+                <IpDisplayBox type="IPv4 Address" ip={ipv4} />
+                <IpDisplayBox type="IPv6 Address" ip={ipv6} />
+              </div>
+              {ipInfo && ipInfo.loc ? (
+                  <MapDisplay coords={ipInfo.loc.split(',').map(Number) as [number, number]} city={ipInfo.city || 'Unknown'} />
+              ) : (
+                  <div id="map" className={`map-placeholder ${showGeoPlaceholders ? 'placeholder-shimmer' : ''}`}>
+                      {!showGeoPlaceholders && <div className="map-placeholder-message">Geolocation data not available</div>}
+                  </div>
+              )}
+            </div>
+           )}
+        </Section>
+        
+        <Section id="details" title="Connection Details" refProp={sectionRefs.details}>
+          {loading ? (
+            <div className="info-grid">
+              {[...Array(6)].map((_, i) => <InfoRowPlaceholder key={i} />)}
+            </div>
+          ) : (
+            <div className="info-grid">
+              <InfoRow icon={<RouterIcon />} label="Local IP Address" value={localIp} />
+              {ipInfo ? (
+                <>
+                  <InfoRow icon={<BuildingIcon/>} label="Service Provider (ISP)" value={ipInfo?.org} href={ipInfo?.org ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.org)}` : undefined} />
+                  <InfoRow icon={<LocationIcon />} label="Location" value={ipInfo ? `${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country}` : 'N/A'} href={ipInfo?.loc ? `https://www.google.com/maps/search/?api=1&query=${ipInfo.loc}`: undefined} />
+                  <InfoRow icon={<ServerIcon />} label="Hostname" value={ipInfo?.hostname} href={ipInfo?.hostname ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.hostname)}` : undefined} />
+                  <InfoRow icon={<ClockIcon />} label="Timezone" value={ipInfo?.timezone} />
+                  <InfoRow icon={<LocationIcon />} label="Postal Code" value={ipInfo?.postal} />
+                </>
+              ) : showGeoPlaceholders ? (
+                 [...Array(5)].map((_, i) => <InfoRowPlaceholder key={`detail-placeholder-${i}`} />)
+              ) : (
+                  <>
+                     <InfoRow icon={<BuildingIcon/>} label="Service Provider (ISP)" value={'N/A'} />
+                     <InfoRow icon={<LocationIcon />} label="Location" value={'N/A'} />
+                     <InfoRow icon={<ServerIcon />} label="Hostname" value={'N/A'} />
+                     <InfoRow icon={<ClockIcon />} label="Timezone" value={'N/A'} />
+                     <InfoRow icon={<LocationIcon />} label="Postal Code" value={'N/A'} />
+                  </>
+              )}
+            </div>
+          )}
+        </Section>
+        
+        <Section id="tools" title="Network Tools" refProp={sectionRefs.tools}>
+            <div className="tools-grid">
+                <div className="tool-item">
+                    <div className="tool-header"><SpeedometerIcon /><h3>Download Speed</h3></div>
+                    <p className="tool-subtitle">Measure your connection's download bandwidth.</p>
+                    <div className="gauge-display">
+                        <div className="gauge-container">
+                            <svg className="gauge" viewBox="0 0 100 100">
+                                <circle className="gauge-bg" cx="50" cy="50" r="44"></circle>
+                                <circle className="gauge-fg" cx="50" cy="50" r="44" strokeDasharray={gaugeCircumference} strokeDashoffset={gaugeCircumference * (1 - speedTestGaugeProgress / 100)}></circle>
+                            </svg>
+                            <div className="gauge-text">
+                                {isTestingSpeed ? <div className="speed-value loading-dots"><span>.</span><span>.</span><span>.</span></div> : downloadSpeed !== null ? <div className="speed-value">{downloadSpeed.toFixed(2)}</div> : <div className="speed-value">--</div>}
+                                <div className="speed-unit">Mbps</div>
+                            </div>
                         </div>
-                   ) : (
-                        <div className="info-grid">
-                            {[...Array(5)].map((_, i) => <InfoRowPlaceholder key={i} />)}
+                    </div>
+                    {speedTestError && !isTestingSpeed && <div className="tool-error">{speedTestError}</div>}
+                    <button className="tool-btn" onClick={handleSpeedTest} disabled={isTestingSpeed}>{isTestingSpeed ? 'Testing...' : 'Start Test'}</button>
+                </div>
+                <div className="tool-item">
+                    <div className="tool-header"><SignalIcon /><h3>Network Latency</h3></div>
+                     <p className="tool-subtitle">Test response time to major services.</p>
+                    <div className="ping-results">
+                        {Object.entries({ 'Google': 0, 'Cloudflare': 0, 'GitHub': 0 }).map(([name]) => (
+                            <div className="ping-row" key={name}>
+                                <div className="ping-target"><span className={`ping-status-dot ${isPinging || !pingResults.hasOwnProperty(name) ? 'pending' : getLatencyClass(pingResults[name])}`}></span>{name}</div>
+                                {isPinging && !pingResults.hasOwnProperty(name) ? <span className="ping-value loading-dots"><span>.</span><span>.</span><span>.</span></span> : pingResults.hasOwnProperty(name) ? (pingResults[name] === null ? <span className="ping-value error">Failed</span> : <span className="ping-value">{pingResults[name]} ms</span>) : <span className="ping-value">-- ms</span>}
+                            </div>
+                        ))}
+                    </div>
+                    <button className="tool-btn" onClick={handlePingTest} disabled={isPinging}>{isPinging ? 'Pinging...' : 'Run Ping Test'}</button>
+                </div>
+                <div className="tool-item">
+                    <div className="tool-header"><DnsIcon /><h3>DNS Lookup</h3></div>
+                    <p className="tool-subtitle">Find DNS records for a domain name.</p>
+                    <div className="tool-input-group">
+                        <input type="text" value={dnsQuery} onChange={(e) => setDnsQuery(e.target.value)} placeholder="e.g., google.com" aria-label="Domain for DNS lookup" onKeyDown={(e) => e.key === 'Enter' && handleDnsLookup()}/>
+                        <button className="tool-btn" onClick={handleDnsLookup} disabled={isDnsLoading || !dnsQuery}>{isDnsLoading ? 'Looking up...' : 'Lookup'}</button>
+                    </div>
+                    {dnsError && <div className="tool-error">{dnsError}</div>}
+                    {dnsResults && (
+                        <div className="tool-results dns-results-container">
+                            {dnsResults.map((record, index) => (
+                                <div className="dns-record" key={`${index}-${record.data}`}>
+                                    <span className="dns-record-type">{record.typeName}</span>
+                                    <span className="dns-record-data">{record.data}</span>
+                                    <span className="dns-record-ttl">TTL: {record.TTL}</span>
+                                </div>
+                            ))}
                         </div>
-                   )}
+                    )}
+                </div>
+                <div className="tool-item">
+                    <div className="tool-header"><WhoisIcon /><h3>WHOIS Lookup</h3></div>
+                    <p className="tool-subtitle">Get registration data for a domain or IP.</p>
+                     <div className="tool-input-group">
+                        <input type="text" value={whoisQuery} onChange={(e) => setWhoisQuery(e.target.value)} placeholder="e.g., google.com or 8.8.8.8" aria-label="Domain or IP for WHOIS lookup" onKeyDown={(e) => e.key === 'Enter' && handleWhoisLookup()}/>
+                        <button className="tool-btn" onClick={handleWhoisLookup} disabled={isWhoisLoading || !whoisQuery}>{isWhoisLoading ? 'Querying...' : 'Query'}</button>
+                    </div>
+                    {whoisError && <div className="tool-error">{whoisError}</div>}
+                    {whoisResults && <div className="tool-results"><pre><code>{whoisResults}</code></pre></div>}
                 </div>
             </div>
-          </>
-        )}
-        <Footer />
+        </Section>
+        
+        <Section id="system" title="System Information" refProp={sectionRefs.system}>
+          {systemInfo ? (
+            <div className="info-grid">
+                <InfoRow icon={<BrowserIcon />} label="Browser" value={systemInfo.browser} />
+                <InfoRow icon={<DesktopIcon />} label="Operating System" value={systemInfo.os} />
+                <InfoRow icon={<HomeIcon />} label="Screen Resolution" value={systemInfo.screenResolution} />
+                <InfoRow icon={<CodeIcon />} label="Device Pixel Ratio" value={systemInfo.devicePixelRatio} />
+                <InfoRow icon={<ServerIcon />} label="User Agent" value={systemInfo.userAgent} />
+            </div>
+           ) : (
+            <div className="info-grid">
+                {[...Array(5)].map((_, i) => <InfoRowPlaceholder key={i} />)}
+            </div>
+           )}
+        </Section>
       </main>
-    </div>
+      <footer className="site-footer">
+          <div className="footer-container">
+              <p>&copy; {new Date().getFullYear()} IP & Network Toolkit. All Rights Reserved.</p>
+              <nav className="footer-nav">
+                 <a href="#" target="_blank" rel="noopener noreferrer">About</a>
+                 <a href="#" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+                 <a href="#" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+              </nav>
+          </div>
+      </footer>
+    </>
   );
 };
 
