@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+// FIX: Added React default import to make React.RefObject type available.
+import React, { useState, useEffect, useCallback } from 'react';
 import { IpInfo, SystemInfo, SectionId } from './types';
 import { getOS, getBrowser } from './utils';
 

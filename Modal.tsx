@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { XIcon } from './components';
 
-const Modal = ({ show, onClose, title, children }: { show: boolean, onClose: () => void, title: string, children: React.ReactNode }) => {
+// FIX: Made the 'children' prop optional to fix TypeScript error where it was incorrectly reported as missing.
+const Modal = ({ show, onClose, title, children }: { show: boolean, onClose: () => void, title: string, children?: React.ReactNode }) => {
     useEffect(() => {
         const handleEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {

@@ -1,3 +1,6 @@
+// FIX: Added React import to make React.ReactNode type available.
+import React from 'react';
+
 // --- Data Types --- //
 export type SectionId = 'overview' | 'details' | 'tools' | 'system';
 export type ToolId = 'speed' | 'latency' | 'dns' | 'whois';

@@ -88,13 +88,15 @@ const privacyContent = (
     </>
 );
 
-const MODAL_CONTENT = {
+// FIX: Added an explicit type to MODAL_CONTENT to help with type inference for the Modal's title prop.
+const MODAL_CONTENT: { [key: string]: { title: string; content: React.ReactNode } } = {
     'about': { title: 'About This Toolkit', content: aboutContent },
     'terms': { title: 'Terms of Service', content: termsContent },
     'privacy': { title: 'Privacy Policy', content: privacyContent },
 };
 
-const Section = ({ id, title, children, refProp }: { id: SectionId; title: string; children: React.ReactNode; refProp: React.RefObject<HTMLElement> }) => (
+// FIX: Made the 'children' prop optional to fix TypeScript error where it was incorrectly reported as missing.
+const Section = ({ id, title, children, refProp }: { id: SectionId; title: string; children?: React.ReactNode; refProp: React.RefObject<HTMLElement> }) => (
     <section id={id} className="content-section" ref={refProp}>
         <h2 className="section-title">{title}</h2>
         {children}
