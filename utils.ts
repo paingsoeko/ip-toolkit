@@ -22,3 +22,18 @@ export const getBrowser = (userAgent: string) => {
     if (/safari/i.test(userAgent)) return 'Apple Safari';
     return 'Unknown';
 };
+
+/**
+ * A wrapper around the native fetch API that enforces HTTPS.
+ * Throws an error if the request URL does not start with 'https://'.
+ * @param url - The URL to fetch.
+ * @param options - The options for the fetch request.
+ * @returns A Promise that resolves to the Response object.
+ */
+export const secureFetch = async (url: string, options?: RequestInit): Promise<Response> => {
+    if (!url.startsWith('https://')) {
+        console.error(`Insecure request blocked: ${url}`);
+        throw new Error('Insecure request blocked: All API calls must use HTTPS.');
+    }
+    return fetch(url, options);
+};

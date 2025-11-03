@@ -1,7 +1,7 @@
 // FIX: Added React default import to make React.RefObject type available.
 import React, { useState, useEffect, useCallback } from 'react';
 import { IpInfo, SystemInfo, SectionId } from './types';
-import { getOS, getBrowser } from './utils';
+import { getOS, getBrowser, secureFetch } from './utils';
 
 export const useIpData = () => {
     const [ipv4, setIpv4] = useState<string | null>(null);
@@ -52,8 +52,8 @@ export const useIpData = () => {
             fetchLocalIp();
 
             const [ipv4Res, ipv6Res] = await Promise.allSettled([
-                fetch('https://api.ipify.org?format=json', { cache: 'no-store' }).then(res => res.json()),
-                fetch('https://api64.ipify.org?format=json', { cache: 'no-store' }).then(res => res.json())
+                secureFetch('https://api.ipify.org?format=json', { cache: 'no-store' }).then(res => res.json()),
+                secureFetch('https://api64.ipify.org?format=json', { cache: 'no-store' }).then(res => res.json())
             ]);
 
             const newIpv4 = ipv4Res.status === 'fulfilled' ? ipv4Res.value.ip : 'Not Detected';
@@ -65,7 +65,7 @@ export const useIpData = () => {
             const geoLookupIp = newIpv4 !== 'N/A' && newIpv4 !== 'Not Detected' ? newIpv4 : (newIpv6 !== 'N/A' && newIpv6 !== 'Not Detected' ? newIpv6 : null);
 
             if (geoLookupIp) {
-                fetch(`https://ipinfo.io/${geoLookupIp}/json`)
+                secureFetch(`https://ipinfo.io/${geoLookupIp}/json`)
                     .then(response => response.ok ? response.json() : null)
                     .then((data: IpInfo | null) => setIpInfo(data))
                     .catch(err => {

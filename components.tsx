@@ -1,79 +1,27 @@
 import React, { useState } from 'react';
 import { IpDisplayBoxProps, InfoRowProps } from './types';
 
-// --- SVG Icon Components --- //
-export const CopyIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-  </svg>
-);
-
-export const CheckIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 6 9 17l-5-5"></path>
-  </svg>
-);
-
-export const LocationIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-);
-
-export const BuildingIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
-);
-
-export const ClockIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-);
-
-export const ServerIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
-);
-
-export const RouterIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6.5 14h.01"/><path d="M10.5 14h.01"/><path d="M14.5 14h.01"/><path d="M18.5 14h.01"/><path d="M17.5 4a2.5 2.5 0 0 1-5 0"/><path d="M12.5 4a2.5 2.5 0 0 1-5 0"/><path d="M12 8V4"/></svg>
-);
-
-export const RefreshIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
-);
-
-export const SpeedometerIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 0 0-9.4 13.5l8.5 8.5a10 10 0 0 0 13.5-9.4A10 10 0 0 0 12 2Z"/><path d="m12 12-4-4"/></svg>
-);
-
-export const SignalIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a8 8 0 0 1 14 0"/><path d="M1.75 9.4a12 12 0 0 1 20.5 0"/><path d="M9 16.5a4 4 0 0 1 6 0"/></svg>
-);
-
-export const BrowserIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M5 6h2"/><path d="M9 6h2"/></svg>
-);
-
-export const DesktopIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-);
-
-export const HomeIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-);
-
-export const CodeIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-);
-
-export const DnsIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.2 7.2a4 4 0 0 1 0 5.6l-2.8 2.8a4 4 0 0 1-5.6 0 4 4 0 0 1 0-5.6l2.8-2.8a4 4 0 0 1 5.6 0z"/><path d="M6.8 16.8a4 4 0 0 1 0-5.6l2.8-2.8a4 4 0 0 1 5.6 0"/></svg>
-);
-
-export const WhoisIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-);
-
-export const XIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-);
+// --- Icon Components (Google Material Symbols) --- //
+export const CopyIcon = () => <span className="material-symbols-outlined">content_copy</span>;
+export const CheckIcon = () => <span className="material-symbols-outlined">check</span>;
+export const LocationIcon = () => <span className="material-symbols-outlined">location_on</span>;
+export const BuildingIcon = () => <span className="material-symbols-outlined">business</span>;
+export const ClockIcon = () => <span className="material-symbols-outlined">schedule</span>;
+export const ServerIcon = () => <span className="material-symbols-outlined">dns</span>;
+export const RouterIcon = () => <span className="material-symbols-outlined">router</span>;
+export const RefreshIcon = () => <span className="material-symbols-outlined">refresh</span>;
+export const SpeedometerIcon = () => <span className="material-symbols-outlined">speed</span>;
+export const SignalIcon = () => <span className="material-symbols-outlined">network_check</span>;
+export const BrowserIcon = () => <span className="material-symbols-outlined">web</span>;
+export const DesktopIcon = () => <span className="material-symbols-outlined">desktop_windows</span>;
+export const HomeIcon = () => <span className="material-symbols-outlined">home</span>;
+export const CodeIcon = () => <span className="material-symbols-outlined">code</span>;
+export const DnsIcon = () => <span className="material-symbols-outlined">dns</span>;
+export const WhoisIcon = () => <span className="material-symbols-outlined">person_search</span>;
+export const XIcon = () => <span className="material-symbols-outlined">close</span>;
+export const BackIcon = () => <span className="material-symbols-outlined">arrow_back</span>;
+export const HubIcon = () => <span className="material-symbols-outlined">hub</span>;
+export const AccountTreeIcon = () => <span className="material-symbols-outlined">account_tree</span>;
 
 
 // --- Placeholder Components --- //
@@ -151,3 +99,22 @@ export const InfoRow = React.memo(({ icon, label, value, href }: InfoRowProps) =
 
     return content;
 });
+
+// --- New Layout Component --- //
+export const ToolPageLayout = ({ title, description, onBack, children }: { title: string, description: string, onBack: () => void, children: React.ReactNode }) => (
+    <div className="tool-page-container">
+        <header className="tool-page-header">
+            <button onClick={onBack} className="back-btn" aria-label="Back to toolkit">
+                <BackIcon />
+                <span>Back</span>
+            </button>
+            <div className="tool-page-title-group">
+                <h1>{title}</h1>
+                <p>{description}</p>
+            </div>
+        </header>
+        <main className="tool-page-content">
+            {children}
+        </main>
+    </div>
+);

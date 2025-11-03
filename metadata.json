@@ -1,6 +1,4 @@
 {
   "name": "IP & Network Toolkit",
-  "description": "A comprehensive toolkit to display your public and local IP addresses, geolocation data, and other network details in a beautiful, tabbed interface.",
-  "requestFramePermissions": [],
-  "prompt": ""
+  "description": "A comprehensive IP & Network Toolkit with a free 'What is my IP?' lookup, speed test, latency test, DNS & WHOIS queries, and detailed geolocation data."
 }

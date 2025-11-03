@@ -44,6 +44,10 @@ a:hover {
   text-decoration: underline;
 }
 
+.material-symbols-outlined {
+  vertical-align: bottom;
+}
+
 /* --- Single Page Layout --- */
 .main-container {
   max-width: 1200px;
@@ -101,9 +105,8 @@ a:hover {
   align-items: center;
   gap: 0.5rem;
 }
-.nav-links button svg {
-  width: 20px;
-  height: 20px;
+.nav-links button .material-symbols-outlined {
+  font-size: 20px;
   flex-shrink: 0;
   color: var(--secondary-text-color);
   transition: color 0.2s ease;
@@ -113,14 +116,14 @@ a:hover {
   color: var(--text-color);
   background-color: rgba(255, 255, 255, 0.1);
 }
-.nav-links button:hover svg {
+.nav-links button:hover .material-symbols-outlined {
   color: var(--text-color);
 }
 .nav-links button.active {
   color: var(--accent-color);
   font-weight: 600;
 }
-.nav-links button.active svg {
+.nav-links button.active .material-symbols-outlined {
     color: var(--accent-color);
 }
 
@@ -172,6 +175,9 @@ a:hover {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+.refresh-btn .material-symbols-outlined {
+  font-size: 20px;
+}
 
 .refresh-btn:hover:not(:disabled) {
   background: #00bc9a;
@@ -184,7 +190,7 @@ a:hover {
   opacity: 0.7;
 }
 
-.refresh-btn.loading svg {
+.refresh-btn.loading .material-symbols-outlined {
   animation: spin 1s linear infinite;
 }
 
@@ -251,7 +257,7 @@ a:hover {
 .ip-address { font-size: 1.5rem; font-weight: 600; color: var(--text-color); font-family: 'Fira Code', 'Courier New', monospace; word-break: break-all; }
 .copy-btn { background: transparent; border: none; color: var(--secondary-text-color); cursor: pointer; padding: 0.5rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; }
 .copy-btn:hover { background-color: rgba(255, 255, 255, 0.1); color: var(--text-color); }
-.copy-btn svg { color: var(--accent-color); }
+.copy-btn .material-symbols-outlined { color: var(--accent-color); font-size: 20px; }
 #map { height: 400px; border-radius: 12px; border: 1px solid var(--border-color); background-color: #1a1a1a; filter: grayscale(80%) brightness(80%); }
 .leaflet-control-attribution, .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: rgba(30,30,30,0.8) !important; color: var(--text-color) !important; box-shadow: 0 1px 5px rgba(0,0,0,0.5) !important; backdrop-filter: blur(5px); border: 1px solid var(--border-color); border-radius: 8px !important; }
 .leaflet-control-attribution a { color: var(--accent-color) !important; }
@@ -277,52 +283,139 @@ a:hover {
 }
 .info-row-clickable:hover { transform: translateY(-2px); border-color: rgba(var(--accent-color-rgb), 0.5); box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.2); cursor: pointer; }
 .info-icon { color: var(--accent-color); flex-shrink: 0; background: rgba(var(--accent-color-rgb), 0.1); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+.info-icon .material-symbols-outlined {
+    font-size: 24px;
+}
 .info-text { display: flex; flex-direction: column; gap: 0.2rem; overflow: hidden; }
 .info-label { font-size: 0.85rem; font-weight: 500; color: var(--secondary-text-color); }
 .info-value { font-size: 1rem; font-weight: 500; color: var(--text-color); word-break: break-word; }
 
-/* --- Tools (Tabbed Interface) --- */
-.tool-tabs {
-  display: flex;
-  gap: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
+/* --- Tools (Card-based Interface) --- */
+.tool-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
 }
-.tool-tabs button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: none;
-  color: var(--secondary-text-color);
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s ease;
-  border-radius: 6px 6px 0 0;
+.tool-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.3s ease;
 }
-.tool-tabs button:hover {
-  color: var(--text-color);
-  background-color: rgba(255, 255, 255, 0.05);
+.tool-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2), 0 0 20px rgba(var(--accent-color-rgb), 0.25);
+    border-color: rgba(var(--accent-color-rgb), 0.5);
 }
-.tool-tabs button.active {
-  color: var(--accent-color);
-  border-bottom-color: var(--accent-color);
+.tool-card-icon {
+    color: var(--accent-color);
+    background-color: rgba(var(--accent-color-rgb), 0.1);
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.tool-tabs button svg {
-  width: 20px;
-  height: 20px;
+.tool-card-icon .material-symbols-outlined {
+    font-size: 28px;
+}
+.tool-card-content {
+    flex-grow: 1;
+}
+.tool-card-content h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+.tool-card-content p {
+    font-size: 0.95rem;
+    color: var(--secondary-text-color);
+    line-height: 1.5;
+}
+.tool-card-btn {
+    margin-top: auto; /* Pushes button to the bottom */
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-align: center;
+    align-self: flex-start; /* Aligns button to the left */
+}
+.tool-card-btn:hover {
+    background: #00bc9a;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(var(--accent-color-rgb), 0.3);
 }
 
-.tool-content {
-  background-color: var(--card-bg);
-  border-radius: 16px;
-  padding: 2rem;
-  border: 1px solid var(--border-color);
+
+/* --- Tool Page Layout --- */
+.tool-page-container {
+    padding-top: 100px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    animation: fadeIn 0.5s ease;
 }
+.tool-page-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 2rem;
+}
+.back-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--secondary-text-color);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--secondary-text-color);
+    color: var(--text-color);
+}
+.back-btn .material-symbols-outlined {
+    font-size: 20px;
+}
+.tool-page-title-group h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+.tool-page-title-group p {
+    font-size: 1.1rem;
+    color: var(--secondary-text-color);
+}
+.tool-page-content {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 2.5rem;
+    border: 1px solid var(--border-color);
+}
+
+
+/* --- Generic Tool Styles (inside pages) --- */
 .tool-panel {
   display: flex;
   flex-direction: column;
@@ -330,7 +423,7 @@ a:hover {
   text-align: center;
   gap: 1.5rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
 }
 .tool-header { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; color: var(--text-color); }
@@ -423,6 +516,39 @@ a:hover {
     color: var(--text-color);
     margin-bottom: 1rem;
     text-transform: capitalize;
+}
+
+/* CIDR Calculator Results */
+.cidr-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 1rem;
+    text-align: left;
+}
+.cidr-result-item {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+}
+.cidr-result-label {
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+    margin-bottom: 0.3rem;
+    display: block;
+}
+.cidr-result-value {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-color);
+    font-family: 'Fira Code', 'Courier New', monospace;
+    word-break: break-all;
+    user-select: all;
+}
+.cidr-result-value-sm {
+    font-size: 1rem;
 }
 
 /* Speed Test Gauge */
@@ -660,6 +786,9 @@ a:hover {
     border-radius: 50%;
     transition: all 0.2s ease;
 }
+.modal-close-btn .material-symbols-outlined {
+    font-size: 24px;
+}
 .modal-close-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
@@ -721,12 +850,13 @@ a:hover {
   .nav-links { flex-grow: 1; justify-content: space-around; }
   .nav-links button { padding: 0.75rem; }
   .nav-links button .nav-label { display: none; }
-  .nav-links button svg { width: 24px; height: 24px; }
+  .nav-links button .material-symbols-outlined { font-size: 24px; }
   .hero-header { padding: 2rem 0; }
   .section-title { font-size: 1.75rem; }
   .info-grid { grid-template-columns: 1fr; }
   .footer-container { flex-direction: column; text-align: center; }
-  .tool-content { padding: 1.5rem 1rem; }
-  .tool-tabs button { flex-grow: 1; justify-content: center; }
+  .tool-page-content { padding: 1.5rem; }
+  .tool-page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .tool-page-title-group h1 { font-size: 2rem; }
   .dns-record { grid-template-columns: 50px 1fr 70px; gap: 0.5rem; font-size: 0.8rem; }
 }

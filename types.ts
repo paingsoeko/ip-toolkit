@@ -3,7 +3,7 @@ import React from 'react';
 
 // --- Data Types --- //
 export type SectionId = 'overview' | 'details' | 'tools' | 'system';
-export type ToolId = 'speed' | 'latency' | 'dns' | 'whois';
+export type ToolId = 'speed' | 'latency' | 'dns' | 'whois' | 'cidr';
 
 export interface IpInfo {
   ip: string;
@@ -54,4 +54,18 @@ export interface InfoRowProps {
 export interface MapDisplayProps {
     coords: [number, number] | null;
     city: string;
+}
+
+export interface CidrResult {
+    ip: string;
+    prefix: number;
+    networkAddress: string;
+    broadcastAddress: string;
+    firstHost: string | null;
+    lastHost: string | null;
+    subnetMask: string;
+    wildcardMask: string;
+    totalHosts: number;
+    usableHosts: number;
+    ipType: 'Public' | 'Private' | 'Loopback' | 'Other';
 }

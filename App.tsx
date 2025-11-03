@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useIpData, useSystemInfo, useIntersectionObserver } from './hooks';
-import { SectionId } from './types';
+import { SectionId, ToolId } from './types';
 import TopNav from './TopNav';
 import Modal from './Modal';
 import MapDisplay from './MapDisplay';
@@ -21,7 +21,13 @@ import {
     DesktopIcon,
     HomeIcon,
     CodeIcon,
+    HubIcon,
 } from './components';
+import SpeedTestPage from './pages/SpeedTestPage';
+import LatencyTestPage from './pages/LatencyTestPage';
+import DnsLookupPage from './pages/DnsLookupPage';
+import WhoisLookupPage from './pages/WhoisLookupPage';
+import CidrCalculatorPage from './pages/CidrCalculatorPage';
 
 // --- Page Content for Modals --- //
 const aboutContent = (
@@ -50,7 +56,7 @@ const termsContent = (
         <h3>Disclaimer of Warranty</h3>
         <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. While we strive for accuracy, we do not warrant that the information provided (including but not limited to IP addresses, geolocation data, and network speed results) is accurate, complete, reliable, or error-free. Your use of the Service is solely at your own risk.</p>
         <h3>Limitation of Liability</h3>
-        <p>In no event shall the creators of the IP & Network Toolkit be liable for any direct, indirect, incidental, special, consequential, or exemplary damages, including but not limited to, damages for loss of profits, goodwill, use, data, or other intangible losses resulting from the use of or inability to use the service.</p>
+        <p>In no event shall the creators of the IP & Network Toolkit be liable for any direct, indirect, incidental, special, consequential, or exemplary damages, including but not to, damages for loss of profits, goodwill, use, data, or other intangible losses resulting from the use of or inability to use the service.</p>
         <h3>Third-Party Services</h3>
         <p>The Service relies on various third-party APIs (such as ipify, ipinfo.io, and Google DNS) to function. We are not responsible for the availability or accuracy of these third-party services. Their use is subject to their respective terms and privacy policies.</p>
         <h3>Changes to Terms</h3>
@@ -88,14 +94,12 @@ const privacyContent = (
     </>
 );
 
-// FIX: Added an explicit type to MODAL_CONTENT to help with type inference for the Modal's title prop.
 const MODAL_CONTENT: { [key: string]: { title: string; content: React.ReactNode } } = {
     'about': { title: 'About This Toolkit', content: aboutContent },
     'terms': { title: 'Terms of Service', content: termsContent },
     'privacy': { title: 'Privacy Policy', content: privacyContent },
 };
 
-// FIX: Made the 'children' prop optional to fix TypeScript error where it was incorrectly reported as missing.
 const Section = ({ id, title, children, refProp }: { id: SectionId; title: string; children?: React.ReactNode; refProp: React.RefObject<HTMLElement> }) => (
     <section id={id} className="content-section" ref={refProp}>
         <h2 className="section-title">{title}</h2>
@@ -117,6 +121,7 @@ const App = () => {
   
   const [heroCopied, setHeroCopied] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<ToolId | 'main'>('main');
 
   const handleHeroCopy = () => {
     if (ipv4 && ipv4 !== 'Not Detected' && navigator.clipboard) {
@@ -128,13 +133,44 @@ const App = () => {
         });
     }
   };
+  
+  const handleNavigate = (tool: ToolId) => {
+    window.scrollTo(0, 0);
+    setCurrentPage(tool);
+  };
+
+  const handleBack = () => {
+    setCurrentPage('main');
+  };
 
   if (error) {
       return <div className="error-fullpage">{error}</div>
   }
 
+  if (currentPage !== 'main') {
+    const pageProps = { onBack: handleBack };
+    switch (currentPage) {
+        case 'speed': return <SpeedTestPage {...pageProps} />;
+        case 'latency': return <LatencyTestPage {...pageProps} />;
+        case 'dns': return <DnsLookupPage {...pageProps} />;
+        case 'whois': return <WhoisLookupPage {...pageProps} />;
+        case 'cidr': return <CidrCalculatorPage defaultIp={ipv4} {...pageProps} />;
+        default: setCurrentPage('main'); return null;
+    }
+  }
+
   const showGeoPlaceholders = !ipInfo && (!!ipv4 || !!ipv6) && (ipv4 !== 'Not Detected' || ipv6 !== 'Not Detected');
 
+  // Parse ASN and ISP from the org string
+  const orgString = ipInfo?.org || '';
+  const asnMatch = orgString.match(/^(AS\d+)\s?(.*)$/);
+  let asn: string | null = null;
+  let isp: string | null = orgString || null;
+  if (asnMatch) {
+      asn = asnMatch[1];
+      isp = asnMatch[2].trim() || null;
+  }
+  
   return (
     <>
       <TopNav activeSection={activeSection} />
@@ -192,24 +228,26 @@ const App = () => {
         <Section id="details" title="Connection Details" refProp={sectionRefs.details}>
           {loading ? (
             <div className="info-grid">
-              {[...Array(6)].map((_, i) => <InfoRowPlaceholder key={i} />)}
+              {[...Array(7)].map((_, i) => <InfoRowPlaceholder key={i} />)}
             </div>
           ) : (
             <div className="info-grid">
               <InfoRow icon={<RouterIcon />} label="Local IP Address" value={localIp} />
               {ipInfo ? (
                 <>
-                  <InfoRow icon={<BuildingIcon/>} label="Service Provider (ISP)" value={ipInfo?.org} href={ipInfo?.org ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.org)}` : undefined} />
+                  <InfoRow icon={<BuildingIcon/>} label="Service Provider (ISP)" value={isp} href={isp ? `https://www.google.com/search?q=${encodeURIComponent(isp)}` : undefined} />
+                  <InfoRow icon={<HubIcon/>} label="Network Group (ASN)" value={asn} href={asn ? `https://www.google.com/search?q=${encodeURIComponent(asn)}` : undefined} />
                   <InfoRow icon={<LocationIcon />} label="Location" value={ipInfo ? `${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country}` : 'N/A'} href={ipInfo?.loc ? `https://www.google.com/maps/search/?api=1&query=${ipInfo.loc}`: undefined} />
                   <InfoRow icon={<ServerIcon />} label="Hostname" value={ipInfo?.hostname} href={ipInfo?.hostname ? `https://www.google.com/search?q=${encodeURIComponent(ipInfo.hostname)}` : undefined} />
                   <InfoRow icon={<ClockIcon />} label="Timezone" value={ipInfo?.timezone} />
                   <InfoRow icon={<LocationIcon />} label="Postal Code" value={ipInfo?.postal} />
                 </>
               ) : showGeoPlaceholders ? (
-                 [...Array(5)].map((_, i) => <InfoRowPlaceholder key={`detail-placeholder-${i}`} />)
+                 [...Array(6)].map((_, i) => <InfoRowPlaceholder key={`detail-placeholder-${i}`} />)
               ) : (
                   <>
                      <InfoRow icon={<BuildingIcon/>} label="Service Provider (ISP)" value={'N/A'} />
+                     <InfoRow icon={<HubIcon/>} label="Network Group (ASN)" value={'N/A'} />
                      <InfoRow icon={<LocationIcon />} label="Location" value={'N/A'} />
                      <InfoRow icon={<ServerIcon />} label="Hostname" value={'N/A'} />
                      <InfoRow icon={<ClockIcon />} label="Timezone" value={'N/A'} />
@@ -221,7 +259,7 @@ const App = () => {
         </Section>
         
         <Section id="tools" title="Network Tools" refProp={sectionRefs.tools}>
-            <NetworkTools />
+            <NetworkTools onNavigate={handleNavigate} />
         </Section>
         
         <Section id="system" title="System Information" refProp={sectionRefs.system}>
